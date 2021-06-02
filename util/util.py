@@ -8,6 +8,7 @@ import importlib
 import argparse
 from argparse import Namespace
 import torchvision
+import cv2
 
 
 # NOTE: the data values should be the same as in `data/unaligned_dataset.py`.
@@ -101,22 +102,22 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
     if len(image_numpy.shape) == 3:
         image_pil = Image.fromarray(image_numpy)
         h, w, _ = image_numpy.shape
+        if aspect_ratio is None:
+            pass
+        elif aspect_ratio > 1.0:
+            image_pil = image_pil.resize((h, int(w * aspect_ratio)), Image.BICUBIC)
+        elif aspect_ratio < 1.0:
+            image_pil = image_pil.resize((int(h / aspect_ratio), w), Image.BICUBIC)
+        image_pil.save(image_path)
     else:
 
         # reverse the scaling in the unaligned dataset
-        image_numpy = image_numpy / MAX_INTENSITY * DATA_MAX
+        image_to_write = (
+            image_numpy.astype(np.float32) / MAX_INTENSITY * DATA_MAX
+        ).astype(np.uint16)
 
         # dump as grayscale image if data has only one channel
-        image_pil = Image.fromarray(image_numpy, 'L')
-        h, w = image_numpy.shape
-
-    if aspect_ratio is None:
-        pass
-    elif aspect_ratio > 1.0:
-        image_pil = image_pil.resize((h, int(w * aspect_ratio)), Image.BICUBIC)
-    elif aspect_ratio < 1.0:
-        image_pil = image_pil.resize((int(h / aspect_ratio), w), Image.BICUBIC)
-    image_pil.save(image_path)
+        cv2.imwrite(image_path, image_to_write)
 
 
 def print_numpy(x, val=True, shp=False):
