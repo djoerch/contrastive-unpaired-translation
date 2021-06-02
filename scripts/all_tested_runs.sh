@@ -160,15 +160,13 @@ n_epochs="40"
 n_epochs_decay="40"
 
 load_size="416"
-#crop_size="386"  # NOTE: in training random crop
-crop_size="${load_size}"  # NOTE: in testing no randomness
+crop_size_train="386"  # NOTE: in training random crop
+crop_size_test="${load_size}"  # NOTE: in testing no randomness
 
-#for dataset in "mv_coronal_512" "mv_axial_512" "mv_coronal_axial_512"
-for dataset in "mv_axial_512"
+for dataset in "mv_coronal_512" "mv_axial_512" "mv_coronal_axial_512"
 do
 
-#    for gan_mode in "vanilla" "lsgan" "wgangp"
-    for gan_mode in "lsgan"
+    for gan_mode in "vanilla" "lsgan" "wgangp"
     do
 
         # 7.a ...
@@ -182,15 +180,18 @@ do
         exp_args+=(--direction "BtoA")
         exp_args+=(--dataroot "/mnt/data/daniel/2d_gan_datasets/${dataset}")
         exp_args+=(--load_size "${load_size}")
-        exp_args+=(--crop_size "${crop_size}")
 
         exp_train_args=()
+        exp_train_args+=(--crop_size "${crop_size_train}")
         exp_train_args+=(--gan_mode "${gan_mode}")
         exp_train_args+=(--n_epochs "${n_epochs}")
         exp_train_args+=(--n_epochs_decay "${n_epochs_decay}")
 
+        exp_test_args=()
+        exp_test_args+=(--crop_size "${crop_size_test}")
+
         #${cmd_train} ${common_args[@]} ${common_train_args[@]} ${exp_args[@]} ${exp_train_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log.txt"
-        ${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
+        ${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} ${exp_test_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
 
         # 7.b ...
         EXP_NAME="mv_base_cut_LR2HS_${dataset}_${gan_mode}_no_preproc"
@@ -203,25 +204,24 @@ do
         exp_args+=(--direction "BtoA")
         exp_args+=(--dataroot "/mnt/data/daniel/2d_gan_datasets/${dataset}")
         exp_args+=(--load_size "${load_size}")
-        exp_args+=(--crop_size "${crop_size}")
 
         exp_train_args=()
+        exp_train_args+=(--crop_size "${crop_size_train}")
         exp_train_args+=(--gan_mode "${gan_mode}")
         exp_train_args+=(--n_epochs "${n_epochs}")
         exp_train_args+=(--n_epochs_decay "${n_epochs_decay}")
         exp_train_args+=(--preprocess "none")
         exp_train_args+=(--no_flip)
 
+        exp_test_args=()
+        exp_test_args+=(--crop_size "${crop_size_test}")
+
         #${cmd_train} ${common_args[@]} ${common_train_args[@]} ${exp_args[@]} ${exp_train_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log.txt"
-        #${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
+        #${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} ${exp_test_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
 
     done  # dataset
 
 done  # gan_mode
-
-
-
-exit
 
 
 
@@ -242,15 +242,18 @@ do
         exp_args+=(--direction "AtoB")
         exp_args+=(--dataroot "/mnt/data/daniel/2d_gan_datasets/${dataset}")
         exp_args+=(--load_size "${load_size}")
-        exp_args+=(--crop_size "${crop_size}")
 
         exp_train_args=()
+        exp_train_args+=(--crop_size "${crop_size_train}")
         exp_train_args+=(--gan_mode "${gan_mode}")
         exp_train_args+=(--n_epochs "${n_epochs}")
         exp_train_args+=(--n_epochs_decay "${n_epochs_decay}")
 
+        exp_test_args=()
+        exp_test_args+=(--crop_size "${crop_size_test}")
+
         #${cmd_train} ${common_args[@]} ${common_train_args[@]} ${exp_args[@]} ${exp_train_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log.txt"
-        ${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
+        ${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} ${exp_test_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
 
         # 7.b ...
         EXP_NAME="mv_base_cut_HS2LR_${dataset}_${gan_mode}_no_preproc"
@@ -263,17 +266,20 @@ do
         exp_args+=(--direction "AtoB")
         exp_args+=(--dataroot "/mnt/data/daniel/2d_gan_datasets/${dataset}")
         exp_args+=(--load_size "${load_size}")
-        exp_args+=(--crop_size "${crop_size}")
 
         exp_train_args=()
+        exp_train_args+=(--crop_size "${crop_size_train}")
         exp_train_args+=(--gan_mode "${gan_mode}")
         exp_train_args+=(--n_epochs "${n_epochs}")
         exp_train_args+=(--n_epochs_decay "${n_epochs_decay}")
         exp_train_args+=(--preprocess "none")
         exp_train_args+=(--no_flip)
 
+        exp_test_args=()
+        exp_test_args+=(--crop_size "${crop_size_test}")
+
         #${cmd_train} ${common_args[@]} ${common_train_args[@]} ${exp_args[@]} ${exp_train_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log.txt"
-        #${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
+        #${cmd_test} ${common_args[@]} ${common_test_args[@]} ${exp_args[@]} ${exp_test_args[@]} >> "${PATH_TO_RESULTS_ROOT}/${EXP_NAME}/.log_test.txt"
 
     done  # dataset
 
