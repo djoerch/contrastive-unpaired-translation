@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-PATH_TO_RESULTS_ROOT="/mnt/data/daniel/CUT/results"
+PATH_TO_RESULTS_ROOT="/mnt/data/daniel/CUT/results_cross_eval"
 PATH_TO_DATASETS_ROOT="/mnt/data/daniel/2d_gan_datasets"
 
-path_to_exp_results="${PATH_TO_RESULTS_ROOT}/mv_base_cut_LR2HS_mv_axial_512_lsgan"
-path_to_dataset="${PATH_TO_DATASETS_ROOT}/mv_axial_512"
+path_to_exp_results="${PATH_TO_RESULTS_ROOT}/mv_coronal_512/mv_base_cut_LR2HS_mv_axial_512_lsgan"
+path_to_dataset="${PATH_TO_DATASETS_ROOT}/mv_coronal_512"
 
-img_plane="axial"
+img_plane="coronal"
 
 
 # restack images
