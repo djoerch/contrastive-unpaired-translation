@@ -1,9 +1,16 @@
+import torch
+import numpy as np
+import cv2
 import os.path
 from data.base_dataset import BaseDataset, get_transform
 from data.image_folder import make_dataset
 from PIL import Image
 import random
 import util.util as util
+
+
+DATA_MAX = 3500
+MAX_INTENSITY = 255
 
 
 class UnalignedDataset(BaseDataset):
@@ -55,8 +62,23 @@ class UnalignedDataset(BaseDataset):
         else:   # randomize the index for domain B to avoid fixed pairs.
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
-        A_img = Image.open(A_path).convert('RGB')
-        B_img = Image.open(B_path).convert('RGB')
+        A_img = cv2.imread(A_path, cv2.IMREAD_UNCHANGED).astype(np.float32)
+        B_img = cv2.imread(B_path, cv2.IMREAD_UNCHANGED).astype(np.float32)
+#        A_img = Image.open(A_path).convert('RGB')
+#        B_img = Image.open(B_path).convert('RGB')
+
+        A_img = np.clip(A_img / DATA_MAX * MAX_INTENSITY, 0, MAX_INTENSITY)
+        B_img = np.clip(B_img / DATA_MAX * MAX_INTENSITY, 0, MAX_INTENSITY)
+
+        A_img = Image.fromarray(A_img)
+        B_img = Image.fromarray(B_img)
+
+#        A_img = torch.unsqueeze(torch.from_numpy(A_img), 0)
+#        B_img = torch.unsqueeze(torch.from_numpy(B_img), 0)
+
+#        print(A_img.shape)
+#        print(B_img.shape)
+#        exit(-1)
 
         # Apply image transformation
         # For FastCUT mode, if in finetuning phase (learning rate is decaying),
@@ -64,7 +86,7 @@ class UnalignedDataset(BaseDataset):
 #        print('current_epoch', self.current_epoch)
         is_finetuning = self.opt.isTrain and self.current_epoch > self.opt.n_epochs
         modified_opt = util.copyconf(self.opt, load_size=self.opt.crop_size if is_finetuning else self.opt.load_size)
-        transform = get_transform(modified_opt)
+        transform = get_transform(modified_opt, grayscale=True)
         A = transform(A_img)
         B = transform(B_img)
 

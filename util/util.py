@@ -10,6 +10,13 @@ from argparse import Namespace
 import torchvision
 
 
+# NOTE: the data values should be the same as in `data/unaligned_dataset.py`.
+#   They have to be redefined here, bc there is no central package in the repo
+#   to do an import here.
+DATA_MAX = 3500
+MAX_INTENSITY = 255
+
+
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -54,9 +61,11 @@ def tensor2im(input_image, imtype=np.uint8):
         else:
             return input_image
         image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()  # convert it into a numpy array
-        if image_numpy.shape[0] == 1:  # grayscale to RGB
-            image_numpy = np.tile(image_numpy, (3, 1, 1))
+#        if image_numpy.shape[0] == 1:  # grayscale to RGB
+#            image_numpy = np.tile(image_numpy, (3, 1, 1))
         image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+        if image_numpy.shape[-1] == 1:  # grayscale to RGB
+            image_numpy = np.squeeze(image_numpy)
     else:  # if it is a numpy array, do nothing
         image_numpy = input_image
     return image_numpy.astype(imtype)
@@ -89,8 +98,17 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
         image_path (str)          -- the path of the image
     """
 
-    image_pil = Image.fromarray(image_numpy)
-    h, w, _ = image_numpy.shape
+    if len(image_numpy.shape) == 3:
+        image_pil = Image.fromarray(image_numpy)
+        h, w, _ = image_numpy.shape
+    else:
+
+        # reverse the scaling in the unaligned dataset
+        image_numpy = image_numpy / MAX_INTENSITY * DATA_MAX
+
+        # dump as grayscale image if data has only one channel
+        image_pil = Image.fromarray(image_numpy, 'L')
+        h, w = image_numpy.shape
 
     if aspect_ratio is None:
         pass
